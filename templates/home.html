@@ -5,38 +5,178 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        margin: 40px;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
       }
       .container {
-        max-width: 800px;
+        max-width: 1200px;
         margin: 0 auto;
       }
+      .header {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .dashboard {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
       .api-link {
-        background: #f4f4f4;
-        padding: 10px;
+        background: #e3f2fd;
+        padding: 15px;
         margin: 10px 0;
         border-radius: 5px;
+        border-left: 4px solid #2196f3;
+      }
+      .api-link a {
+        color: #1976d2;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .api-link a:hover {
+        text-decoration: underline;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .stat {
+        background: #f0f7ff;
+        padding: 15px;
+        border-radius: 5px;
+        text-align: center;
+      }
+      .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1976d2;
+      }
+      .stat-label {
+        color: #666;
+        font-size: 14px;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>UK Weather Data API</h1>
-      <p>Welcome to the UK MetOffice Weather Data API!</p>
+      <div class="header">
+        <h1>UK Weather Data API Dashboard</h1>
+        <p>Django REST API for UK MetOffice Weather Data</p>
+      </div>
 
-      <h2>Available API Endpoints:</h2>
-      <div class="api-link">
-        <strong>Regions:</strong>
-        <a href="/api/regions/" target="_blank">/api/regions/</a>
+      <div class="dashboard">
+        <div class="card">
+          <h2>API Endpoints</h2>
+          <div class="api-link">
+            <strong>Regions:</strong>
+            <a href="/api/regions/" target="_blank">/api/regions/</a>
+            <div style="font-size: 12px; color: #666; margin-top: 5px">
+              Get all UK regions (England, Scotland, Wales, etc.)
+            </div>
+          </div>
+          <div class="api-link">
+            <strong>Weather Parameters:</strong>
+            <a href="/api/parameters/" target="_blank">/api/parameters/</a>
+            <div style="font-size: 12px; color: #666; margin-top: 5px">
+              Get weather measurement types (Temperature, Rainfall, etc.)
+            </div>
+          </div>
+          <div class="api-link">
+            <strong>Weather Data:</strong>
+            <a href="/api/weather-data/" target="_blank">/api/weather-data/</a>
+            <div style="font-size: 12px; color: #666; margin-top: 5px">
+              Get historical weather measurements
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>System Information</h2>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-number" id="region-count">-</div>
+              <div class="stat-label">Regions</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number" id="parameter-count">-</div>
+              <div class="stat-label">Parameters</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number" id="data-count">-</div>
+              <div class="stat-label">Data Points</div>
+            </div>
+          </div>
+
+          <h3>API Filtering Examples:</h3>
+          <div style="font-size: 14px; color: #666">
+            <p>
+              <strong>Filter by region:</strong><br />
+              <a href="/api/weather-data/?region__code=UK" target="_blank"
+                >/api/weather-data/?region__code=UK</a
+              >
+            </p>
+
+            <p>
+              <strong>Filter by parameter:</strong><br />
+              <a href="/api/weather-data/?parameter__code=Tmax" target="_blank"
+                >/api/weather-data/?parameter__code=Tmax</a
+              >
+            </p>
+
+            <p>
+              <strong>Filter by year:</strong><br />
+              <a href="/api/weather-data/?year__gte=2020" target="_blank"
+                >/api/weather-data/?year__gte=2020</a
+              >
+            </p>
+          </div>
+        </div>
       </div>
-      <div class="api-link">
-        <strong>Weather Parameters:</strong>
-        <a href="/api/parameters/" target="_blank">/api/parameters/</a>
-      </div>
-      <div class="api-link">
-        <strong>Weather Data:</strong>
-        <a href="/api/weather-data/" target="_blank">/api/weather-data/</a>
+
+      <div class="card" style="margin-top: 20px">
+        <h2>Admin Panel</h2>
+        <p>
+          Add and manage weather data:
+          <a href="/admin/" target="_blank">Django Admin</a>
+        </p>
       </div>
     </div>
+
+    <script>
+      // Load statistics
+      fetch("/api/regions/")
+        .then((response) => response.json())
+        .then(
+          (data) =>
+            (document.getElementById("region-count").textContent = data.count)
+        );
+
+      fetch("/api/parameters/")
+        .then((response) => response.json())
+        .then(
+          (data) =>
+            (document.getElementById("parameter-count").textContent =
+              data.count)
+        );
+
+      fetch("/api/weather-data/")
+        .then((response) => response.json())
+        .then(
+          (data) =>
+            (document.getElementById("data-count").textContent = data.count)
+        );
+    </script>
   </body>
 </html>
